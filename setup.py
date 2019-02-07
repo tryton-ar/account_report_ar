@@ -64,7 +64,7 @@ setup(name=name,
         ],
     package_data={
         'trytond.modules.account_report_ar': (info.get('xml', [])
-            + ['tryton.cfg', 'view/*.xml', 'locale/*.po', '*.odt']),
+            + ['tryton.cfg', 'view/*.xml', 'locale/*.po', '*.fodt']),
         },
     classifiers=[
         'Development Status :: 4 - Beta',
