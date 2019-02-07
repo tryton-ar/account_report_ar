@@ -1,22 +1,46 @@
-# account_report_ar
-The Tryton *account_report_ar* module.
+account_report_ar
+=================
 
-Add reports of Accounting to Argentina
+The account_report_ar module of the Tryton application platform.
+Adds accounting reports of Argentina.
 
-# Support
-If you encounter any problems with this module, please don't hesitate to ask questions on the module bug tracker:
+Installing
+----------
 
-https://github.com/tryton-ar/account_report_ar
+See INSTALL
 
-For more information please contact the programmers at Gcoop
+Support
+-------
 
- - website: http://www.gcoop.coop
- - email: info@gcoop.coop
+If you encounter any problems with this module, please don't hesitate to ask
+questions on the module bug tracker:
 
-# License
+  https://github.com/tryton-ar/account_report_ar/issues
+
+For more information please contact the programmers at tryton-ar
+
+  website: https://groups.google.com/forum/#!forum/tryton-ar
+
+If you encounter any problems with Tryton, please don't hesitate to ask
+questions on the Tryton bug tracker, mailing list, wiki or IRC channel:
+
+  http://bugs.tryton.org/
+  http://groups.tryton.org/
+  http://wiki.tryton.org/
+  irc://irc.freenode.net/tryton
+  irc://irc.freenode.net/tryton-es
+
+License
+-------
 
 See LICENSE
 
-# Copyright
+Copyright
+---------
 
 See COPYRIGHT
+
+
+For more information please visit the Tryton web site:
+
+  http://www.tryton.org/
