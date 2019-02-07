@@ -1,6 +1,5 @@
-#! -*- coding: utf8 -*-
-#This file is part of Tryton.  The COPYRIGHT file at the top level of
-#this repository contains the full copyright notices and license terms.
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
 
 from trytond.pool import Pool, PoolMeta
 from decimal import Decimal
@@ -9,10 +8,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__ = ['GeneralJournal']
-__metaclass__ = PoolMeta
 
 
 class GeneralJournal:
+    __metaclass__ = PoolMeta
     __name__ = 'account.move.general_journal'
 
     @classmethod
