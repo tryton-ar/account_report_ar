@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 __all__ = ['GeneralJournal']
 
 
-class GeneralJournal:
-    __metaclass__ = PoolMeta
+class GeneralJournal(metaclass=PoolMeta):
     __name__ = 'account.move.general_journal'
 
     @classmethod
