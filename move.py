@@ -1,37 +1,21 @@
-# This file is part of Tryton.  The COPYRIGHT file at the top level of
-# this repository contains the full copyright notices and license terms.
-
-from trytond.pool import Pool, PoolMeta
+# This file is part of the account_report_ar module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
+import logging
 from decimal import Decimal
 
-import logging
-logger = logging.getLogger(__name__)
+from trytond.pool import PoolMeta
 
-__all__ = ['GeneralJournal']
+logger = logging.getLogger(__name__)
 
 
 class GeneralJournal(metaclass=PoolMeta):
     __name__ = 'account.move.general_journal'
 
     @classmethod
-    def _get_records(cls, ids, model, data):
-        Move = Pool().get('account.move')
-
-        clause = [
-            ('date', '>=', data['from_date']),
-            ('date', '<=', data['to_date']),
-            ('period.fiscalyear.company', '=', data['company']),
-            ]
-        if data['posted']:
-            clause.append(('state', '=', 'posted'))
-        return Move.search(clause,
-                 order=[('date', 'ASC'), ('post_number', 'ASC')])
-
-    @classmethod
-    def get_context(cls, records, data):
-        report_context = super(GeneralJournal, cls).get_context(records, data)
+    def get_context(cls, records, header, data):
+        report_context = super().get_context(records, header, data)
         report_context['get_total_move'] = cls.get_total_move
-
         return report_context
 
     @classmethod
