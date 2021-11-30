@@ -1,0 +1,47 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "model:ir.action,name:account_report_ar_general_journal"
+msgid "General Journal"
+msgstr "Libro diario"
+
+msgctxt "report:account.move.general_journal:"
+msgid "/"
+msgstr "/"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Account"
+msgstr "Cuenta"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Company:"
+msgstr "Empresa:"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Credit"
+msgstr "Haber"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Date:"
+msgstr "Fecha:"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Debit"
+msgstr "Debe"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Description"
+msgstr "Descripción"
+
+msgctxt "report:account.move.general_journal:"
+msgid "General Journal"
+msgstr "Libro diario"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Journal Entry:"
+msgstr "Asiento:"
+
+msgctxt "report:account.move.general_journal:"
+msgid "Total"
+msgstr "Total"
