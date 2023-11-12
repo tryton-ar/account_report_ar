@@ -4,9 +4,11 @@
 
 from trytond.pool import Pool
 from . import move
+from . import account
 
 
 def register():
     Pool.register(
         move.GeneralJournal,
+        account.ChartAccount,
         module='account_report_ar', type_='report')

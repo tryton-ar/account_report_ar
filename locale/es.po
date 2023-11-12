@@ -6,6 +6,38 @@ msgctxt "model:ir.action,name:account_report_ar_general_journal"
 msgid "General Journal"
 msgstr "Libro diario"
 
+msgctxt "model:ir.action,name:report_chart_account"
+msgid "Chart of Accounts"
+msgstr "Plan contable"
+
+msgctxt "model:ir.ui.menu,name:menu_chart_account"
+msgid "Chart of Accounts"
+msgstr "Plan contable"
+
+msgctxt "report:account.chart_account:"
+msgid "/"
+msgstr "/"
+
+msgctxt "report:account.chart_account:"
+msgid "Accounts"
+msgstr "Cuentas"
+
+msgctxt "report:account.chart_account:"
+msgid "Chart of Accounts"
+msgstr "Plan contable"
+
+msgctxt "report:account.chart_account:"
+msgid "Print Date:"
+msgstr "Fecha impresión:"
+
+msgctxt "report:account.chart_account:"
+msgid "User:"
+msgstr "Usuario:"
+
+msgctxt "report:account.chart_account:"
+msgid "at"
+msgstr "a las"
+
 msgctxt "report:account.move.general_journal:"
 msgid "/"
 msgstr "/"
