@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<tryton>
+    <data>
+
+        <record model="ir.action.report" id="report_chart_account">
+            <field name="name">Chart of Accounts</field>
+            <field name="model"></field>
+            <field name="report_name">account.chart_account</field>
+            <field name="report">account_report_ar/chart_account.fodt</field>
+        </record>
+        <menuitem action="report_chart_account"
+            id="menu_chart_account"
+            parent="account.menu_account_tree"
+            sequence="20"/>
+
+    </data>
+</tryton>
