@@ -6,7 +6,7 @@
             <field name="name">General Journal</field>
             <field name="model">account.move</field>
             <field name="report_name">account.move.general_journal</field>
-            <field name="report">account_report_ar/general_journal.fodt</field>
+            <field name="report">account_report_ar/report/general_journal.fodt</field>
             <field name="active" eval="True"/>
         </record>
 
