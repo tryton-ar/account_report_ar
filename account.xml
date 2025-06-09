@@ -2,11 +2,13 @@
 <tryton>
     <data>
 
+<!-- Chart of Accounts -->
+
         <record model="ir.action.report" id="report_chart_account">
             <field name="name">Chart of Accounts</field>
             <field name="model"></field>
             <field name="report_name">account.chart_account</field>
-            <field name="report">account_report_ar/chart_account.fodt</field>
+            <field name="report">account_report_ar/report/chart_account.fodt</field>
         </record>
         <menuitem action="report_chart_account"
             id="menu_chart_account"

@@ -2,10 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "model:ir.action,name:account_report_ar_general_journal"
-msgid "General Journal"
-msgstr "Libro diario"
-
 msgctxt "model:ir.action,name:report_chart_account"
 msgid "Chart of Accounts"
 msgstr "Plan contable"
