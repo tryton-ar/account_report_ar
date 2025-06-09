@@ -2,13 +2,33 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "field:account.print_move_general_journal.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:account.print_move_general_journal.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Ejercicio fiscal"
+
+msgctxt "model:account.print_move_general_journal.start,name:"
+msgid "General Journal"
+msgstr "Libro diario"
+
 msgctxt "model:ir.action,name:report_chart_account"
 msgid "Chart of Accounts"
 msgstr "Plan contable"
 
+msgctxt "model:ir.action,name:wizard_print_move_general_journal"
+msgid "General Journal"
+msgstr "Libro diario"
+
 msgctxt "model:ir.ui.menu,name:menu_chart_account"
 msgid "Chart of Accounts"
 msgstr "Plan contable"
+
+msgctxt "model:ir.ui.menu,name:menu_print_move_general_journal"
+msgid "General Journal"
+msgstr "Libro diario"
 
 msgctxt "report:account.chart_account:"
 msgid "/"
@@ -73,3 +93,11 @@ msgstr "Asiento:"
 msgctxt "report:account.move.general_journal:"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "wizard_button:account.print_move_general_journal,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:account.print_move_general_journal,start,print_:"
+msgid "Print"
+msgstr "Imprimir"

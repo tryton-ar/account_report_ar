@@ -9,6 +9,12 @@ from . import account
 
 def register():
     Pool.register(
+        move.PrintGeneralJournalStart,
+        module='account_report_ar', type_='model')
+    Pool.register(
+        move.PrintGeneralJournal,
+        module='account_report_ar', type_='wizard')
+    Pool.register(
         move.GeneralJournal,
         account.ChartAccount,
         module='account_report_ar', type_='report')
