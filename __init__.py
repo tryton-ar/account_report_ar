@@ -3,9 +3,11 @@
 # the full copyright notices and license terms.
 
 from trytond.pool import Pool
+
 from . import move
 from . import account
 
+__all__ = ['register']
 
 def register():
     Pool.register(
