@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<form col="4">
+    <label name="period"/>
+    <field name="period"/>
+    <label name="company"/>
+    <field name="company"/>
+    <group id="csv_format" colspan="4" col="-1">
+        <label name="csv_format"/>
+        <field name="csv_format"/>
+        <label name="proration"/>
+        <field name="proration"/>
+    </group>
+</form>
