@@ -6,19 +6,34 @@ from trytond.pool import Pool
 
 from . import move
 from . import account
+from . import invoice
+from . import subdiario
 
 __all__ = ['register']
 
 def register():
     Pool.register(
         move.PrintGeneralJournalStart,
+        invoice.Invoice,
+        subdiario.SubdiarioPurchaseStart,
+        subdiario.SubdiarioSaleStart,
         module='account_report_ar', type_='model')
     Pool.register(
         move.PrintGeneralJournal,
         account.PrinChartAccountBalance,
+        subdiario.SubdiarioPurchase,
+        subdiario.SubdiarioSale,
+        subdiario.SubdiarioSaleType,
+        subdiario.SubdiarioSaleSubdivision,
         module='account_report_ar', type_='wizard')
     Pool.register(
         move.GeneralJournal,
         account.ChartAccount,
         account.ChartAccountBalance,
+        subdiario.SubdiarioPurchaseReport,
+        subdiario.SubdiarioPurchasePDFReport,
+        subdiario.SubdiarioSaleReport,
+        subdiario.SubdiarioSalePDFReport,
+        subdiario.SubdiarioSaleTypeReport,
+        subdiario.SubdiarioSaleSubdivisionReport,
         module='account_report_ar', type_='report')
