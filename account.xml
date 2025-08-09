@@ -15,5 +15,23 @@
             parent="account.menu_account_tree"
             sequence="20"/>
 
+<!-- Balance of Accounts -->
+
+        <record model="ir.action.report" id="report_chart_account_balance">
+            <field name="name">Balance of Accounts</field>
+            <field name="model">account.account</field>
+            <field name="report_name">account.chart_account_balance</field>
+            <field name="report">account_report_ar/report/chart_account_balance.fodt</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_print_chart_account_balance">
+            <field name="name">Balance of Accounts</field>
+            <field name="wiz_name">account.print_chart_account_balance</field>
+        </record>
+        <menuitem action="wizard_print_chart_account_balance"
+            id="menu_chart_account_balance"
+            parent="account.menu_account_tree_chart"
+            sequence="20" icon="tryton-print"/>
+
     </data>
 </tryton>

@@ -15,8 +15,10 @@ def register():
         module='account_report_ar', type_='model')
     Pool.register(
         move.PrintGeneralJournal,
+        account.PrinChartAccountBalance,
         module='account_report_ar', type_='wizard')
     Pool.register(
         move.GeneralJournal,
         account.ChartAccount,
+        account.ChartAccountBalance,
         module='account_report_ar', type_='report')
