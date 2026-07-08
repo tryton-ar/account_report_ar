@@ -101,7 +101,7 @@ Create product::
 Create customer invoices::
 
     >>> Invoice = Model.get('account.invoice')
-    >>> invoice = Invoice()
+    >>> invoice = Invoice(type='out')
     >>> invoice.party = customer
     >>> invoice.pos = pos
     >>> invoice.invoice_date = period.start_date
@@ -114,7 +114,7 @@ Create customer invoices::
     'posted'
     >>> invoice.total_amount
     Decimal('242.00')
-    >>> invoice = Invoice()
+    >>> invoice = Invoice(type='out')
     >>> invoice.party = customer
     >>> invoice.pos = pos
     >>> invoice.invoice_date = period.start_date
@@ -131,8 +131,7 @@ Create customer invoices::
 Create supplier invoices::
 
     >>> Invoice = Model.get('account.invoice')
-    >>> invoice = Invoice()
-    >>> invoice.type = 'in'
+    >>> invoice = Invoice(type='in')
     >>> invoice.party = supplier
     >>> invoice.tipo_comprobante = '001'
     >>> invoice.reference = '00001-00000312'
@@ -159,8 +158,7 @@ Create supplier invoices::
     Decimal('42.00')
     >>> invoice.total_amount
     Decimal('242.00')
-    >>> invoice = Invoice()
-    >>> invoice.type = 'in'
+    >>> invoice = Invoice(type='in')
     >>> invoice.party = supplier
     >>> invoice.tipo_comprobante = '011'
     >>> invoice.reference = '00002-00000061'
