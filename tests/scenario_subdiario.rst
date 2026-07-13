@@ -4,6 +4,7 @@ subdiario Scenario
 
 Imports::
     >>> import datetime as dt
+    >>> from dateutil.relativedelta import relativedelta
     >>> from decimal import Decimal
     >>> from proteus import Model, Wizard
     >>> from trytond.tests.tools import activate_modules
@@ -17,8 +18,11 @@ Imports::
     >>> from trytond.modules.account_invoice.tests.tools import \
     ...     set_fiscalyear_invoice_sequences
     >>> from trytond.modules.account_invoice_ar.tests.tools import \
-    ...     create_pos, get_pos, get_tax
-    >>> today = dt.date.today()
+    ...     create_pos, get_pos, get_invoice_types, get_tax
+    >>> from trytond.tests.tools import activate_modules, assertEqual, assertTrue
+
+    >>> # today = dt.date.today()
+    >>> today = dt.date(2019, 1, 1)
 
 Install account_report_ar::
 
@@ -27,6 +31,8 @@ Install account_report_ar::
 Create company::
 
     >>> currency = get_currency('ARS')
+    >>> currency.afip_code = 'PES'
+    >>> currency.save()
     >>> _ = create_company(currency=currency)
     >>> company = get_company()
     >>> tax_identifier = company.party.identifiers.new()
@@ -35,10 +41,24 @@ Create company::
     >>> company.party.iva_condition = 'responsable_inscripto'
     >>> company.party.save()
 
+Set employee::
+
+    >>> User = Model.get('res.user')
+    >>> Party = Model.get('party.party')
+    >>> Employee = Model.get('company.employee')
+    >>> employee_party = Party(name="Employee")
+    >>> employee_party.save()
+    >>> employee = Employee(party=employee_party)
+    >>> employee.save()
+    >>> user = User(config.user)
+    >>> user.employees.append(employee)
+    >>> user.employee = employee
+    >>> user.save()
+
 Create fiscal year::
 
     >>> fiscalyear = set_fiscalyear_invoice_sequences(
-    ...     create_fiscalyear(company))
+    ...     create_fiscalyear(company, today))
     >>> fiscalyear.click('create_period')
     >>> period = fiscalyear.periods[0]
     >>> period_ids = [p.id for p in fiscalyear.periods]
@@ -58,6 +78,7 @@ Create point of sale::
 
     >>> _ = create_pos(company)
     >>> pos = get_pos()
+    >>> invoice_types = get_invoice_types()
 
 Create taxes::
 
@@ -65,19 +86,64 @@ Create taxes::
     >>> purchase_tax = get_tax('IVA Compras 21%')
     >>> purchase_tax_nogravado = get_tax('IVA Compras No Gravado')
 
-Create parties::
+Create payment method::
+
+    >>> Journal = Model.get('account.journal')
+    >>> PaymentMethod = Model.get('account.invoice.payment.method')
+    >>> Sequence = Model.get('ir.sequence')
+    >>> journal_cash, = Journal.find([('type', '=', 'cash')])
+    >>> payment_method = PaymentMethod()
+    >>> payment_method.name = 'Cash'
+    >>> payment_method.journal = journal_cash
+    >>> payment_method.credit_account = account_cash
+    >>> payment_method.debit_account = account_cash
+    >>> payment_method.save()
+
+Create Write Off method::
+
+    >>> WriteOff = Model.get('account.move.reconcile.write_off')
+    >>> journal_writeoff = Journal(name='Write-Off', type='write-off')
+    >>> journal_writeoff.save()
+    >>> writeoff_method = WriteOff()
+    >>> writeoff_method.name = 'Rate loss'
+    >>> writeoff_method.journal = journal_writeoff
+    >>> writeoff_method.credit_account = account_expense
+    >>> writeoff_method.debit_account = account_expense
+    >>> writeoff_method.save()
+
+Create Supplier Responsable Inscripto::
 
     >>> Party = Model.get('party.party')
-    >>> supplier = Party(name='Supplier',
+    >>> supplier_ri = Party(name='Supplier',
     ...     iva_condition='responsable_inscripto',
     ...     vat_number='33333333339')
-    >>> supplier.account_payable = account_payable
-    >>> supplier.save()
-    >>> customer = Party(name='Customer',
+    >>> supplier_ri.account_payable = account_payable
+    >>> supplier_ri.save()
+
+Create Supplier Monotributo::
+
+    >>> Party = Model.get('party.party')
+    >>> supplier_mn = Party(name='Supplier',
+    ...     iva_condition='monotributo',
+    ...     vat_number='33333333339')
+    >>> supplier_mn.account_payable = account_payable
+    >>> supplier_mn.save()
+
+Create Customer Responsable Inscripto::
+
+    >>> customer_ri = Party(name='Customer',
     ...     iva_condition='responsable_inscripto',
     ...     vat_number='33333333339')
-    >>> customer.account_receivable = account_receivable
-    >>> customer.save()
+    >>> customer_ri.account_receivable = account_receivable
+    >>> customer_ri.save()
+
+Create Customer Monotributo::
+
+    >>> customer_mn = Party(name='Customer',
+    ...     iva_condition='monotributo',
+    ...     vat_number='33333333339')
+    >>> customer_mn.account_receivable = account_receivable
+    >>> customer_mn.save()
 
 Create account category::
 
@@ -104,14 +170,24 @@ Create product::
     >>> template.save()
     >>> product, = template.products
 
+Create payment term::
+
+    >>> PaymentTerm = Model.get('account.invoice.payment_term')
+    >>> payment_term = PaymentTerm(name='Term')
+    >>> line = payment_term.lines.new(type='remainder')
+    >>> payment_term.save()
+
 Create customer invoices::
 
     >>> Invoice = Model.get('account.invoice')
+    >>> InvoiceLine = Model.get('account.invoice.line')
     >>> invoice = Invoice(type='out')
-    >>> invoice.party = customer
+    >>> invoice.party = customer_ri
     >>> invoice.pos = pos
+    >>> # invoice.payment_term = payment_term
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('40')
@@ -121,10 +197,12 @@ Create customer invoices::
     >>> invoice.total_amount
     Decimal('242.00')
     >>> invoice = Invoice(type='out')
-    >>> invoice.party = customer
+    >>> invoice.party = customer_mn
     >>> invoice.pos = pos
+    >>> # invoice.payment_term = payment_term
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('20')
@@ -138,19 +216,24 @@ Create supplier invoices::
 
     >>> Invoice = Model.get('account.invoice')
     >>> invoice = Invoice(type='in')
-    >>> invoice.party = supplier
+    >>> invoice.party = supplier_ri
     >>> invoice.tipo_comprobante = '001'
-    >>> invoice.reference = '00001-00000312'
+    >>> invoice.ref_pos_number = '1'
+    >>> invoice.ref_voucher_number = '312'
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('40')
+    >>> invoice.save()
     >>> invoice.click('validate_invoice')
     >>> invoice.state
     'validated'
     >>> bool(invoice.move)
     True
+    >>> invoice.move.state
+    'draft'
     >>> invoice.click('post')
     >>> invoice.state
     'posted'
@@ -165,16 +248,19 @@ Create supplier invoices::
     >>> invoice.total_amount
     Decimal('242.00')
     >>> invoice = Invoice(type='in')
-    >>> invoice.party = supplier
+    >>> invoice.party = supplier_mn
     >>> invoice.tipo_comprobante = '011'
-    >>> invoice.reference = '00002-00000061'
+    >>> invoice.ref_pos_number = '1'
+    >>> invoice.ref_voucher_number = '061'
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.account = account_expense
     >>> line.taxes.append(purchase_tax_nogravado)
     >>> line.description = 'Test'
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('20')
+    >>> invoice.save()
     >>> invoice.click('validate_invoice')
     >>> invoice.state
     'validated'

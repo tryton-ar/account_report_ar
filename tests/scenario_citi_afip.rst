@@ -17,7 +17,10 @@ Imports::
     >>> from trytond.modules.account_invoice.tests.tools import \
     ...     set_fiscalyear_invoice_sequences
     >>> from trytond.modules.account_invoice_ar.tests.tools import \
-    ...     create_pos, get_pos, get_tax
+    ...     create_pos, get_pos, get_invoice_types, get_tax
+    >>> from trytond.tests.tools import activate_modules, assertEqual, assertTrue
+
+    >>> # today = dt.date.today()
     >>> today = dt.date(2019, 1, 1)
 
 Install account_report_ar::
@@ -27,6 +30,8 @@ Install account_report_ar::
 Create company::
 
     >>> currency = get_currency('ARS')
+    >>> currency.afip_code = 'PES'
+    >>> currency.save()
     >>> _ = create_company(currency=currency)
     >>> company = get_company()
     >>> tax_identifier = company.party.identifiers.new()
@@ -34,6 +39,20 @@ Create company::
     >>> tax_identifier.code = '30710158254' # gcoop CUIT
     >>> company.party.iva_condition = 'responsable_inscripto'
     >>> company.party.save()
+
+Set employee::
+
+    >>> User = Model.get('res.user')
+    >>> Party = Model.get('party.party')
+    >>> Employee = Model.get('company.employee')
+    >>> employee_party = Party(name="Employee")
+    >>> employee_party.save()
+    >>> employee = Employee(party=employee_party)
+    >>> employee.save()
+    >>> user = User(config.user)
+    >>> user.employees.append(employee)
+    >>> user.employee = employee
+    >>> user.save()
 
 Create fiscal year::
 
@@ -47,11 +66,18 @@ Create chart of accounts::
 
     >>> _ = create_chart(company, chart='account_ar.root_ar')
     >>> accounts = get_accounts(company)
+    >>> account_receivable = accounts['receivable']
+    >>> account_payable = accounts['payable']
+    >>> account_revenue = accounts['revenue']
+    >>> account_expense = accounts['expense']
+    >>> account_tax = accounts['sale_tax']
+    >>> account_cash = accounts['cash']
 
 Create point of sale::
 
     >>> _ = create_pos(company)
     >>> pos = get_pos()
+    >>> invoice_types = get_invoice_types()
 
 Create taxes::
 
@@ -59,27 +85,72 @@ Create taxes::
     >>> purchase_tax = get_tax('IVA Compras 21%')
     >>> purchase_tax_nogravado = get_tax('IVA Compras No Gravado')
 
-Create parties::
+Create payment method::
+
+    >>> Journal = Model.get('account.journal')
+    >>> PaymentMethod = Model.get('account.invoice.payment.method')
+    >>> Sequence = Model.get('ir.sequence')
+    >>> journal_cash, = Journal.find([('type', '=', 'cash')])
+    >>> payment_method = PaymentMethod()
+    >>> payment_method.name = 'Cash'
+    >>> payment_method.journal = journal_cash
+    >>> payment_method.credit_account = account_cash
+    >>> payment_method.debit_account = account_cash
+    >>> payment_method.save()
+
+Create Write Off method::
+
+    >>> WriteOff = Model.get('account.move.reconcile.write_off')
+    >>> journal_writeoff = Journal(name='Write-Off', type='write-off')
+    >>> journal_writeoff.save()
+    >>> writeoff_method = WriteOff()
+    >>> writeoff_method.name = 'Rate loss'
+    >>> writeoff_method.journal = journal_writeoff
+    >>> writeoff_method.credit_account = account_expense
+    >>> writeoff_method.debit_account = account_expense
+    >>> writeoff_method.save()
+
+Create Supplier Responsable Inscripto::
 
     >>> Party = Model.get('party.party')
-    >>> supplier = Party(name='Supplier',
+    >>> supplier_ri = Party(name='Supplier',
     ...     iva_condition='responsable_inscripto',
     ...     vat_number='33333333339')
-    >>> supplier.account_payable = accounts['payable']
-    >>> supplier.save()
-    >>> customer = Party(name='Customer',
+    >>> supplier_ri.account_payable = account_payable
+    >>> supplier_ri.save()
+
+Create Supplier Monotributo::
+
+    >>> Party = Model.get('party.party')
+    >>> supplier_mn = Party(name='Supplier',
+    ...     iva_condition='monotributo',
+    ...     vat_number='33333333339')
+    >>> supplier_mn.account_payable = account_payable
+    >>> supplier_mn.save()
+
+Create Customer Responsable Inscripto::
+
+    >>> customer_ri = Party(name='Customer',
     ...     iva_condition='responsable_inscripto',
-    ...     vat_number='30688555872')
-    >>> customer.account_receivable = accounts['receivable']
-    >>> customer.save()
+    ...     vat_number='33333333339')
+    >>> customer_ri.account_receivable = account_receivable
+    >>> customer_ri.save()
+
+Create Customer Monotributo::
+
+    >>> customer_mn = Party(name='Customer',
+    ...     iva_condition='monotributo',
+    ...     vat_number='33333333339')
+    >>> customer_mn.account_receivable = account_receivable
+    >>> customer_mn.save()
 
 Create account category::
 
     >>> ProductCategory = Model.get('product.category')
     >>> account_category = ProductCategory(name="Account Category")
     >>> account_category.accounting = True
-    >>> account_category.account_expense = accounts['expense']
-    >>> account_category.account_revenue = accounts['revenue']
+    >>> account_category.account_expense = account_expense
+    >>> account_category.account_revenue = account_revenue
     >>> account_category.customer_taxes.append(sale_tax)
     >>> account_category.supplier_taxes.append(purchase_tax)
     >>> account_category.save()
@@ -101,11 +172,14 @@ Create product::
 Create customer invoices::
 
     >>> Invoice = Model.get('account.invoice')
+    >>> InvoiceLine = Model.get('account.invoice.line')
     >>> invoice = Invoice(type='out')
-    >>> invoice.party = customer
+    >>> invoice.party = customer_ri
     >>> invoice.pos = pos
+    >>> # invoice.payment_term = payment_term
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('40')
@@ -115,10 +189,12 @@ Create customer invoices::
     >>> invoice.total_amount
     Decimal('242.00')
     >>> invoice = Invoice(type='out')
-    >>> invoice.party = customer
+    >>> invoice.party = customer_mn
     >>> invoice.pos = pos
+    >>> # invoice.payment_term = payment_term
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('20')
@@ -132,19 +208,24 @@ Create supplier invoices::
 
     >>> Invoice = Model.get('account.invoice')
     >>> invoice = Invoice(type='in')
-    >>> invoice.party = supplier
+    >>> invoice.party = supplier_ri
     >>> invoice.tipo_comprobante = '001'
-    >>> invoice.reference = '00001-00000312'
+    >>> invoice.ref_pos_number = '1'
+    >>> invoice.ref_voucher_number = '312'
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
     >>> line.product = product
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('40')
+    >>> invoice.save()
     >>> invoice.click('validate_invoice')
     >>> invoice.state
     'validated'
     >>> bool(invoice.move)
     True
+    >>> invoice.move.state
+    'draft'
     >>> invoice.click('post')
     >>> invoice.state
     'posted'
@@ -159,16 +240,19 @@ Create supplier invoices::
     >>> invoice.total_amount
     Decimal('242.00')
     >>> invoice = Invoice(type='in')
-    >>> invoice.party = supplier
+    >>> invoice.party = supplier_mn
     >>> invoice.tipo_comprobante = '011'
-    >>> invoice.reference = '00002-00000061'
+    >>> invoice.ref_pos_number = '1'
+    >>> invoice.ref_voucher_number = '061'
     >>> invoice.invoice_date = period.start_date
-    >>> line = invoice.lines.new()
-    >>> line.account = accounts['expense']
+    >>> line = InvoiceLine()
+    >>> invoice.lines.append(line)
+    >>> line.account = account_expense
     >>> line.taxes.append(purchase_tax_nogravado)
     >>> line.description = 'Test'
     >>> line.quantity = 5
     >>> line.unit_price = Decimal('20')
+    >>> invoice.save()
     >>> invoice.click('validate_invoice')
     >>> invoice.state
     'validated'
@@ -199,6 +283,14 @@ Generate rg3685 report::
     >>> rg3685.execute('exportar')
     >>> rg3685.state
     'exportar'
+    >>> len(rg3685.form.sale_docs) > 0
+    True
+    >>> len(rg3685.form.sale_aliqs) > 0
+    True
+    >>> len(rg3685.form.purchase_docs) > 0
+    True
+    >>> len(rg3685.form.purchase_aliqs) > 0
+    True
     >>> # rg3685.form.sale_docs
     >>> # rg3685.form.sale_aliqs
     >>> # rg3685.form.purchase_docs
