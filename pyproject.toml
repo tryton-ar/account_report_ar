@@ -45,10 +45,12 @@ include = [
     'view/**/*.xml',
     'locale/**/*.po',
     '**/*.fodt',
+    '**/*.fods',
     'icons/**/*.svg',
     'tests/**/*.rst',
     'tests/**/*.json',
     'tests/**/*.csv',
+    'tests/**/*.txt',
     ]
 exclude = ['doc']
 
@@ -56,7 +58,9 @@ exclude = ['doc']
 "" = "trytond/modules/account_report_ar"
 
 [tool.hatch.metadata.hooks.tryton]
-dependencies = []
+dependencies = [
+    'unidecode >= 1.0.23',
+    ]
 copyright = 'COPYRIGHT'
 readme = 'README.rst'
 
