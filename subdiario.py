@@ -12,6 +12,7 @@ from trytond.model import ModelView, fields
 from trytond.wizard import Wizard, StateView, StateReport, Button
 from trytond.report import Report
 from trytond.pool import Pool
+from trytond.pyson import Eval
 from trytond.transaction import Transaction
 
 _ZERO = Decimal('0')
@@ -28,6 +29,7 @@ class Subdiario(object):
             ('company', '=', data['company']),
             ('type', '=', 'in'),
             ('state', 'in', ['posted', 'paid']),
+            ('journal.do_not_report', '!=', True),
             ]
         if data['date'] == 'post_date':
             clause.extend([
@@ -625,7 +627,11 @@ class SubdiarioSaleStart(ModelView):
     to_date = fields.Date('To Date', required=True)
     company = fields.Many2One('company.company', 'Company', required=True)
     pos = fields.Many2Many('account.pos', None, None, 'Points of Sale',
-        required=True, help="Por defecto puntos de venta electrónicos")
+        required=True, domain=[
+            ('company', '=', Eval('company')),
+            ('pos_do_not_report', '!=', True),
+            ],
+        help="Por defecto puntos de venta electrónicos")
 
     @staticmethod
     def default_from_date():
@@ -647,9 +653,9 @@ class SubdiarioSaleStart(ModelView):
         Pos = pool.get('account.pos')
         company_id = Transaction().context.get('company')
         pos = Pos.search([
-            ('pos_type', '=', 'electronic'),
-            ('pos_do_not_report', '=', False),
             ('company', '=', company_id),
+            ('pos_type', '=', 'electronic'),
+            ('pos_do_not_report', '!=', True),
             ])
         return pos
 

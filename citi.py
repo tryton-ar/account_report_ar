@@ -163,9 +163,9 @@ class CitiWizard(Wizard):
 
         invoices = Invoice.search([
             ('type', '=', 'out'),
-            ('pos.pos_do_not_report', '=', False),
             ['OR', ('state', 'in', ['posted', 'paid']),
                 [('state', '=', 'cancelled'), ('number', '!=', None)]],
+            ('pos.pos_do_not_report', '!=', True),
             ('move.period', '=', self.start.period),
             ], order=[
             ('pos', 'ASC'),
@@ -410,6 +410,7 @@ class CitiWizard(Wizard):
         invoices = Invoice.search([
             ('type', '=', 'in'),
             ('state', 'in', ['posted', 'paid']),
+            ('journal.do_not_report', '!=', True),
             ('move.period', '=', self.start.period),
             ], order=[
             ('invoice_date', 'ASC'),
