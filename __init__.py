@@ -5,7 +5,6 @@
 from trytond.pool import Pool
 from . import move
 from . import account
-from . import pos
 from . import citi
 from . import invoice
 from . import subdiario
@@ -16,7 +15,6 @@ __all__ = ['register']
 def register():
     Pool.register(
         move.PrintGeneralJournalStart,
-        pos.Pos,
         citi.CitiStart,
         citi.CitiExportar,
         invoice.Invoice,
