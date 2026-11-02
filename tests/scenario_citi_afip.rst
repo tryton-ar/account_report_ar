@@ -1,5 +1,5 @@
 ====================
-RG3685 AFIP Scenario
+RG3685 ARCA Scenario
 ====================
 
 Imports::

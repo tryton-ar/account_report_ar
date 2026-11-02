@@ -257,7 +257,7 @@ class CitiWizard(Wizard):
             codigo_documento_comprador = invoice.party.tipo_documento
             if invoice.party.vat_number:
                 # Si tenemos vat_number, entonces tenemos CUIT Argentino
-                # use the Argentina AFIP's global CUIT for the country:
+                # use the Argentina ARCA's global CUIT for the country:
                 identificacion_comprador = invoice.party.vat_number
                 codigo_documento_comprador = '80'
             elif invoice.party.vat_number_afip_foreign:

@@ -2,7 +2,8 @@
 <tryton>
     <data>
 
-        <!-- Print General Journal report -->
+<!-- Print General Journal report -->
+
         <record model="ir.ui.view" id="print_move_general_journal_start_view_form">
             <field name="model">account.print_move_general_journal.start</field>
             <field name="type">form</field>
@@ -18,7 +19,8 @@
             parent="account.menu_reporting"
             sequence="15" icon="tryton-print"/>
 
-        <!-- General Journal report -->
+<!-- General Journal report -->
+
         <record model="ir.action.report" id="account.report_general_journal">
             <field name="name">General Journal</field>
             <field name="model">account.move</field>
